@@ -1,0 +1,6 @@
+codecov:
+  token: your_codecov_token
+  files:
+    - src/**/*.js
+  flags:
+    - frontend
