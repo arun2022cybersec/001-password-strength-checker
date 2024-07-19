@@ -1,0 +1,3 @@
+version: v1
+monitor:
+  project: password-strength-checker
