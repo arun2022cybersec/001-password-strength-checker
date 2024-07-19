@@ -32,7 +32,7 @@
     "hasown": "^2.0.2",
     "immediate": "^3.0.6",
     "json-stringify-safe": "^5.0.1",
-    "lie": "^3.1.1",
+    "lie": "^3.3.0",
     "localforage": "^1.10.0",
     "matcher": "^3.0.0",
     "object-keys": "^1.1.1",
