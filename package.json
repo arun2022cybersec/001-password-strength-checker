@@ -36,7 +36,7 @@
     "localforage": "^1.10.0",
     "matcher": "^3.0.0",
     "object-keys": "^1.1.1",
-    "roarr": "^2.15.4",
+    "roarr": "^7.21.1",
     "semver": "^7.6.3",
     "semver-compare": "^1.0.0",
     "serialize-error": "^7.0.1",
