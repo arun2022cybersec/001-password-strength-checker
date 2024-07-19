@@ -1,0 +1,37 @@
+name: Auto Label Issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label Issue
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const issue = context.payload.issue;
+            if (issue.title.includes('bug')) {
+              await github.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['bug']
+              });
+            } else if (issue.title.includes('feature')) {
+              await github.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['enhancement']
+              });
+            } else if (issue.title.includes('question')) {
+              await github.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['question']
+              });
+            }
