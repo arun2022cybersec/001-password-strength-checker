@@ -20,7 +20,7 @@
     "es-define-property": "^1.0.0",
     "es-errors": "^1.3.0",
     "es6-error": "^4.1.1",
-    "escape-string-regexp": "^4.0.0",
+    "escape-string-regexp": "^5.0.0",
     "function-bind": "^1.1.2",
     "get-intrinsic": "^1.2.4",
     "global-agent": "^3.0.0",
