@@ -28,3 +28,5 @@ dc6b617 chore: Update Wiki clone URL in workflow
 1fe7e35 chore: Update Wiki clone URL and configure Git user details in workflow
 ## Recent Changes
 810caf7 chore: Update Wiki clone URL and configure Git user details in workflow
+## Recent Changes
+3e22c58 chore: Update Wiki push URL to use GITHUB_TOKEN for authentication
