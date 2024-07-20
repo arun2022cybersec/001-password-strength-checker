@@ -22,3 +22,5 @@ a572443 chore: Update workflows to use YAML instead of JSON for task loading
 dc6b617 chore: Update Wiki clone URL in workflow
 ## Recent Changes
 4d2d81b chore: Update Wiki clone URL in workflow
+## Recent Changes
+0c2fb9f chore: Update Wiki clone URL and configure Git user details in workflow
