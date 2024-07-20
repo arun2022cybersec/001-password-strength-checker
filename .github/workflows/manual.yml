@@ -10,6 +10,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Initialize todolist.yml with the initial version
+      - name: Initialize todolist.yml
+        run: |
+          echo "version: 0.0.1" > todolist.yml
+
       - name: Load Tasks from YAML
         id: load_tasks
         run: |
@@ -60,9 +65,10 @@ jobs:
             const projectId = ${ { steps.create_project.outputs.projectId } }; // Get the project ID
             const columnIds = JSON.parse(${ { steps.create_project.outputs.columnIds } }); // Get the column IDs
 
+            // Create issues and tasks based on the loaded YAML
             for (const branch of todos.branches) {
               const branchName = branch.branch;
-              
+
               // Create the branch if it doesn't exist
               try {
                 await github.git.createRef({
@@ -75,26 +81,19 @@ jobs:
                 console.log(`Branch ${branchName} already exists.`);
               }
 
-              // Create issues for the branch
               for (const issue of branch.issues) {
-                const milestone = issue.todos[0].milestone; // Use the milestone from the first todo
-                const taskList = issue.todos.map((todo, index) => `- :white_circle: Task ${index + 1}: ${todo.task} (ID: #task-${index + 1})`).join('\n');
-                
+                const milestone = issue.milestone; // Unique milestone for each issue
                 const issueResponse = await github.issues.create({
                   owner: owner,
                   repo: repo,
                   title: issue.issue,
                   body: `
                     Tasks:
-                    ${taskList}
-                    \n\n
-                    To start working on a task, click the corresponding button below:
-                    \n
-                    ${issue.todos.map((todo, index) => `- [ ] Task ${index + 1} - Click to activate`).join('\n')}
+                    ${issue.todos.map((todo) => `- [ ] ${todo.task} (${todo.label})`).join('\n')}
                   `,
-                  labels: [issue.todos[0].tag], // Use the tag from the first todo for labeling
+                  labels: [issue.todos[0].label], // Use the label from the first todo for labeling
                   assignees: [assignee],
-                  milestone: milestone // Assign milestone from the todo
+                  milestone: milestone // Assign unique milestone from the issue
                 });
 
                 // Add the issue to the project in the "To Do" column
@@ -110,7 +109,7 @@ jobs:
                     owner: owner,
                     repo: repo,
                     issue_number: issueResponse.data.number,
-                    body: `- [ ] ${todo.task} (Tag: ${todo.tag}, Version: ${todo.version}, Milestone: ${todo.milestone})`
+                    body: `- [ ] ${todo.task} (Label: ${todo.label})`
                   });
                 }
 

@@ -33,7 +33,7 @@ jobs:
                 body: `Commit made for task #${taskId}: ${commitMessage}`
               });
 
-              // Check if all tasks are completed
+              // Check if all tasks in the issue are completed
               const issue = await github.issues.get({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -43,11 +43,36 @@ jobs:
               const allTasksCompleted = /* Logic to check if all tasks are completed based on the issue body */;
 
               if (allTasksCompleted) {
-                await github.issues.update({
+                // Increment the minor version for the issue completion
+                const currentVersion = process.env.version;
+                const [major, minor, patch] = currentVersion.split('.').map(Number);
+                const newVersion = `${major}.${minor + 1}.0`;
+
+                // Update the version in todolist.yml
+                const fs = require('fs');
+                const yaml = require('js-yaml');
+                const todolistPath = 'todolist.yml';
+                const todolistData = yaml.load(fs.readFileSync(todolistPath, 'utf8'));
+
+                // Update the main version
+                todolistData.version = newVersion;
+                fs.writeFileSync(todolistPath, yaml.dump(todolistData));
+
+                // Create a new Git tag
+                await github.git.createRef({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  issue_number: issueNumber,
-                  state: 'closed'
+                  ref: `refs/tags/v${newVersion}`,
+                  sha: context.sha
+                });
+
+                // Move the issue to the "Done" column
+                const projectId = /* Logic to get the project ID */;
+                const columnIds = /* Logic to get the column IDs */;
+                await github.projects.moveCard({
+                  card_id: issue.id, // This will need to be the card ID in the project
+                  position: 'top',
+                  column_id: columnIds[2] // Move to "Done"
                 });
               }
             }
