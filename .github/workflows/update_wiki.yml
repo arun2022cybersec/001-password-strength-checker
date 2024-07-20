@@ -14,8 +14,8 @@ jobs:
 
       - name: Checkout Wiki
         run: |
-          git clone https://github.com/${{ github.repository }}.wiki.git
-          cd ${{ github.repository }}.wiki
+          git clone https://github.com/${{ github.repository }}/wiki.git
+          cd ${{ github.repository }}/wiki
           # Populate the Wiki with relevant information
           echo "## Project Updates" >> Home.md
           echo "### New Features" >> Home.md
