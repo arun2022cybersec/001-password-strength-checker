@@ -20,36 +20,37 @@ jobs:
 
       - name: Create Project and Columns
         id: create_project
-        uses: actions/github-script@v5  # Ensure you are using the latest version
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const projectName = repo; // Use the repository name as the project name
-
+            
             // Create a new project
-            const project = await github.projects.createForRepo({
+            const project = await github.rest.projects.createForRepo({
               owner: owner,
               repo: repo,
               name: projectName,
               body: "This project tracks todos and issues."
             });
-
+            
             // Create columns in the project
             const columnNames = ["To Do", "In Progress", "Done"];
+            const projectId = project.data.id;
             const columnIds = await Promise.all(columnNames.map(async (name) => {
-              const column = await github.projects.createColumn({
-                project_id: project.data.id,
+              const column = await github.rest.projects.createColumn({
+                project_id: projectId,
                 name: name
               });
               return column.data.id;
             }));
-
-            return { projectId: project.data.id, columnIds: columnIds };
+            
+            return { projectId: projectId, columnIds: columnIds };
 
       - name: Create Branches and Issues
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -57,8 +58,8 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const assignee = owner; // Assign issues to the repo owner
-            const projectId = ${{ steps.create_project.outputs.projectId }}; // Corrected syntax
-            const columnIds = JSON.parse(${{ steps.create_project.outputs.columnIds }}); // Corrected syntax
+            const projectId = ${{ steps.create_project.outputs.projectId }}; // Get the project ID
+            const columnIds = JSON.parse(${{ steps.create_project.outputs.columnIds }}); // Get the column IDs
 
             // Create issues and tasks based on the loaded YAML
             for (const branch of todos.branches) {
@@ -66,7 +67,7 @@ jobs:
 
               // Create the branch if it doesn't exist
               try {
-                await github.git.createRef({
+                await github.rest.git.createRef({
                   owner: owner,
                   repo: repo,
                   ref: `refs/heads/${branchName}`,
@@ -82,7 +83,7 @@ jobs:
 
               for (const issue of branch.issues) {
                 const milestone = issue.milestone; // Unique milestone for each issue
-                const issueResponse = await github.issues.create({
+                const issueResponse = await github.rest.issues.create({
                   owner: owner,
                   repo: repo,
                   title: issue.issue,
@@ -96,7 +97,7 @@ jobs:
                 });
 
                 // Add the issue to the project in the "To Do" column
-                await github.projects.createCard({
+                await github.rest.projects.createCard({
                   column_id: columnIds[0], // "To Do" column
                   content_id: issueResponse.data.id,
                   project_id: projectId // Use the retrieved project ID
@@ -104,7 +105,7 @@ jobs:
 
                 // Create comments for each todo in the issue
                 for (const todo of issue.todos) {
-                  await github.issues.createComment({
+                  await github.rest.issues.createComment({
                     owner: owner,
                     repo: repo,
                     issue_number: issueResponse.data.number,
@@ -113,7 +114,7 @@ jobs:
                 }
 
                 // Mention the reviewer in a comment
-                await github.issues.createComment({
+                await github.rest.issues.createComment({
                   owner: owner,
                   repo: repo,
                   issue_number: issueResponse.data.number,
