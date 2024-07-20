@@ -1,0 +1,53 @@
+name: Commit Handler
+
+on:
+  push:
+    branches-ignore:
+      - '*'
+
+jobs:
+  handle_commits:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Process Commits
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const commitMessage = context.payload.head_commit.message;
+            const taskRegex = /#task-(\d+)/; // Assuming you use #task-<task_number> in commit messages
+            const match = commitMessage.match(taskRegex);
+
+            if (match) {
+              const taskId = match[1]; // Extract the task ID from the commit message
+              const issueNumber = /* Logic to find the associated issue number based on task ID */;
+
+              // Comment on the issue with the commit details
+              await github.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: `Commit made for task #${taskId}: ${commitMessage}`
+              });
+
+              // Check if all tasks are completed
+              const issue = await github.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber
+              });
+
+              const allTasksCompleted = /* Logic to check if all tasks are completed based on the issue body */;
+
+              if (allTasksCompleted) {
+                await github.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  state: 'closed'
+                });
+              }
+            }

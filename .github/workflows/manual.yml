@@ -1,4 +1,4 @@
-name: Project Automation
+name: Project Setup
 
 on:
   workflow_dispatch: # Allows manual triggering from the GitHub website
@@ -18,14 +18,47 @@ jobs:
           node -e "const fs = require('fs'); const yaml = require('js-yaml'); const data = yaml.load(fs.readFileSync('todolist.yml', 'utf8')); console.log(JSON.stringify(data));" > tasks.json
           echo "tasks=$(cat tasks.json)" >> $GITHUB_ENV
 
+      - name: Create Project and Columns
+        id: create_project
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const projectName = repo; // Use the repository name as the project name
+
+            // Create a new project
+            const project = await github.projects.create({
+              owner: owner,
+              repo: repo,
+              name: projectName,
+              body: "This project tracks todos and issues."
+            });
+
+            // Create columns in the project
+            const columnNames = ["To Do", "In Progress", "Done"];
+            const columnIds = await Promise.all(columnNames.map(async (name) => {
+              const column = await github.projects.createColumn({
+                project_id: project.data.id,
+                name: name
+              });
+              return column.data.id;
+            }));
+
+            return { projectId: project.data.id, columnIds: columnIds };
+
       - name: Create Branches and Issues
         uses: actions/github-script@v3
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const todos = JSON.parse(process.env.tasks);
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const assignee = owner; // Assign issues to the repo owner
+            const projectId = ${ { steps.create_project.outputs.projectId } }; // Get the project ID
+            const columnIds = JSON.parse(${ { steps.create_project.outputs.columnIds } }); // Get the column IDs
 
             for (const branch of todos.branches) {
               const branchName = branch.branch;
@@ -44,13 +77,31 @@ jobs:
 
               // Create issues for the branch
               for (const issue of branch.issues) {
+                const milestone = issue.todos[0].milestone; // Use the milestone from the first todo
+                const taskList = issue.todos.map((todo, index) => `- :white_circle: Task ${index + 1}: ${todo.task} (ID: #task-${index + 1})`).join('\n');
+                
                 const issueResponse = await github.issues.create({
                   owner: owner,
                   repo: repo,
                   title: issue.issue,
-                  body: `Tasks:\n\n- [ ] ${issue.todos.map(todo => todo.task).join('\n- [ ] ')}`,
+                  body: `
+                    Tasks:
+                    ${taskList}
+                    \n\n
+                    To start working on a task, click the corresponding button below:
+                    \n
+                    ${issue.todos.map((todo, index) => `- [ ] Task ${index + 1} - Click to activate`).join('\n')}
+                  `,
                   labels: [issue.todos[0].tag], // Use the tag from the first todo for labeling
-                  assignees: [assignee]
+                  assignees: [assignee],
+                  milestone: milestone // Assign milestone from the todo
+                });
+
+                // Add the issue to the project in the "To Do" column
+                await github.projects.createCard({
+                  column_id: columnIds[0], // "To Do" column
+                  content_id: issueResponse.data.id,
+                  project_id: projectId // Use the retrieved project ID
                 });
 
                 // Create comments for each todo in the issue
@@ -62,5 +113,13 @@ jobs:
                     body: `- [ ] ${todo.task} (Tag: ${todo.tag}, Version: ${todo.version}, Milestone: ${todo.milestone})`
                   });
                 }
+
+                // Mention the reviewer in a comment
+                await github.issues.createComment({
+                  owner: owner,
+                  repo: repo,
+                  issue_number: issueResponse.data.number,
+                  body: `@${assignee}, please review this issue.`
+                });
               }
             }
