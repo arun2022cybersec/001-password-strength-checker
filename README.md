@@ -8,3 +8,5 @@ To install the project, clone the repository and run:
 
 ```bash
 npm install
+## Recent Changes
+958bb97 chore: Update workflows to use YAML instead of JSON for task loading
