@@ -13,7 +13,8 @@ jobs:
       - name: Load Tasks from JSON
         id: load_tasks
         run: |
-          echo "tasks=$(cat todolist.json)" >> $GITHUB_ENV
+            tasks=$(cat todolist.json | sed 's/"/\\"/g' | tr -d '\n')
+            echo "tasks=${tasks}" >> $GITHUB_ENV
 
       - name: Create Branches and Issues
         uses: actions/github-script@v3
