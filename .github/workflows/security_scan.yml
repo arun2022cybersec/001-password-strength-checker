@@ -2,18 +2,18 @@ name: Security Scan
 
 on:
   push:
-	branches:
-	  - main
+    branches:
+      - main
 
 jobs:
   scan:
-	runs-on: ubuntu-latest
-	steps:
-	  - name: Checkout code
-		uses: actions/checkout@v2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-	  - name: Install Snyk CLI
-		run: npm install -g snyk
+      - name: Install Snyk CLI
+        run: npm install -g snyk
 
-	  - name: Run Snyk to check for vulnerabilities
-		run: snyk test
+      - name: Run Snyk to check for vulnerabilities
+        run: snyk test

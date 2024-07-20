@@ -2,22 +2,22 @@ name: Update README
 
 on:
   push:
-	branches:
-	  - main
+    branches:
+      - main
 
 jobs:
   update-readme:
-	runs-on: ubuntu-latest
-	steps:
-	  - name: Checkout code
-		uses: actions/checkout@v2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-	  - name: Update README
-		run: |
-		  echo "## Recent Changes" >> README.md
-		  git log --oneline -n 5 >> README.md # Append last 5 commits to README
-		  git config user.name github-actions
-		  git config user.email github-actions@github.com
-		  git add README.md
-		  git commit -m "Update README with recent changes"
-		  git push
+      - name: Update README
+        run: |
+          echo "## Recent Changes" >> README.md
+          git log --oneline -n 5 >> README.md # Append last 5 commits to README
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add README.md
+          git commit -m "Update README with recent changes"
+          git push
