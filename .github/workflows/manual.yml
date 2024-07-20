@@ -13,18 +13,20 @@ jobs:
       - name: Load Tasks from JSON
         id: load_tasks
         run: |
-            tasks=$(cat todolist.json | sed 's/"/\\"/g' | tr -d '\n')
+            tasks=$(cat todolist.json | base64)
             echo "tasks=${tasks}" >> $GITHUB_ENV
 
       - name: Create Branches and Issues
         uses: actions/github-script@v3
         with:
           script: |
-            const todos = JSON.parse(process.env.tasks);
+            const base64 = process.env.tasks;
+            const todosStr = Buffer.from(base64, 'base64').toString('utf-8');
+            const todos = JSON.parse(todosStr);
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const assignee = owner; // Assign issues to the repo owner
-
+      
             for (const branch of todos.branches) {
               const branchName = branch.branch;
               
