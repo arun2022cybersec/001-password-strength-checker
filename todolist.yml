@@ -1,0 +1,62 @@
+branches:
+  - branch: feature/branch-one
+    issues:
+      - issue: Issue 1 for Branch One
+        todos:
+          - task: Todo 1.1 for Issue 1
+            tag: enhancement
+            version: v1.0
+            milestone: Release 1.0
+          - task: Todo 1.2 for Issue 1
+            tag: bug
+            version: v1.0
+            milestone: Release 1.0
+          - task: Todo 1.3 for Issue 1
+            tag: documentation
+            version: v1.0
+            milestone: Release 1.0
+      - issue: Issue 2 for Branch One
+        todos:
+          - task: Todo 2.1 for Issue 2
+            tag: enhancement
+            version: v1.0
+            milestone: Release 1.0
+          - task: Todo 2.2 for Issue 2
+            tag: bug
+            version: v1.0
+            milestone: Release 1.0
+          - task: Todo 2.3 for Issue 2
+            tag: documentation
+            version: v1.0
+            milestone: Release 1.0
+
+  - branch: feature/branch-two
+    issues:
+      - issue: Issue 1 for Branch Two
+        todos:
+          - task: Todo 1.1 for Issue 1
+            tag: enhancement
+            version: v1.1
+            milestone: Release 1.1
+          - task: Todo 1.2 for Issue 1
+            tag: bug
+            version: v1.1
+            milestone: Release 1.1
+          - task: Todo 1.3 for Issue 1
+            tag: documentation
+            version: v1.1
+            milestone: Release 1.1
+      - issue: Issue 2 for Branch Two
+        todos:
+          - task: Todo 2.1 for Issue 2
+            tag: enhancement
+            version: v1.1
+            milestone: Release 1.1
+          - task: Todo 2.2 for Issue 2
+            tag: bug
+            version: v1.1
+            milestone: Release 1.1
+          - task: Todo 2.3 for Issue 2
+            tag: documentation
+            version: v1.1
+            milestone: Release 1.1

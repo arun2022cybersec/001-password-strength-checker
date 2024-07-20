@@ -10,23 +10,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Load Tasks from JSON
+      - name: Install js-yaml
+        run: |
+          npm install js-yaml
+
+      - name: Load Tasks from YAML
         id: load_tasks
         run: |
-            tasks=$(cat todolist.json | base64)
-            echo "tasks=${tasks}" >> $GITHUB_ENV
+          echo "tasks=$(node -e \"const fs = require('fs'); const yaml = require('js-yaml'); console.log(JSON.stringify(yaml.load(fs.readFileSync('todolist.yml', 'utf8'))));\")" >> $GITHUB_ENV
 
       - name: Create Branches and Issues
         uses: actions/github-script@v3
         with:
           script: |
-            const base64 = process.env.tasks;
-            const todosStr = Buffer.from(base64, 'base64').toString('utf-8');
-            const todos = JSON.parse(todosStr);
+            const todos = JSON.parse(process.env.tasks);
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const assignee = owner; // Assign issues to the repo owner
-      
+
             for (const branch of todos.branches) {
               const branchName = branch.branch;
               
@@ -49,7 +50,7 @@ jobs:
                   repo: repo,
                   title: issue.issue,
                   body: `Tasks:\n\n- [ ] ${issue.todos.map(todo => todo.task).join('\n- [ ] ')}`,
-                  labels: [issue.tag],
+                  labels: [issue.todos[0].tag], // Use the tag from the first todo for labeling
                   assignees: [assignee]
                 });
 
