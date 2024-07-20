@@ -10,11 +10,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Initialize todolist.yml with the initial version
-      - name: Initialize todolist.yml
-        run: |
-          echo "version: 0.0.1" > todolist.yml
-
       - name: Load Tasks from YAML
         id: load_tasks
         run: |
@@ -34,7 +29,7 @@ jobs:
             const projectName = repo; // Use the repository name as the project name
 
             // Create a new project
-            const project = await github.projects.create({
+            const project = await github.projects.createForRepo({
               owner: owner,
               repo: repo,
               name: projectName,
