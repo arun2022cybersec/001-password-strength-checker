@@ -10,14 +10,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install js-yaml
+      - name: Install Node.js and js-yaml
         run: |
-          npm install js-yaml
+          npm install -g js-yaml
 
       - name: Load Tasks from YAML
         id: load_tasks
         run: |
-          echo "tasks=$(node -e \"const fs = require('fs'); const yaml = require('js-yaml'); console.log(JSON.stringify(yaml.load(fs.readFileSync('todolist.yml', 'utf8'))));\")" >> $GITHUB_ENV
+          echo "Loading tasks from todolist.yml"
+          node -e "const fs = require('fs'); const yaml = require('js-yaml'); const data = yaml.load(fs.readFileSync('todolist.yml', 'utf8')); console.log(JSON.stringify(data));" > tasks.json
+          echo "tasks=$(cat tasks.json)" >> $GITHUB_ENV
 
       - name: Create Branches and Issues
         uses: actions/github-script@v3
