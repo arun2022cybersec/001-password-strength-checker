@@ -1,0 +1,63 @@
+name: Project Automation
+
+on:
+  workflow_dispatch: # Allows manual triggering from the GitHub website
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Load Tasks from JSON
+        id: load_tasks
+        run: |
+          echo "tasks=$(cat todolist.json)" >> $GITHUB_ENV
+
+      - name: Create Branches and Issues
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const todos = JSON.parse(process.env.tasks);
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const assignee = owner; // Assign issues to the repo owner
+
+            for (const branch of todos.branches) {
+              const branchName = branch.branch;
+              
+              // Create the branch if it doesn't exist
+              try {
+                await github.git.createRef({
+                  owner: owner,
+                  repo: repo,
+                  ref: `refs/heads/${branchName}`,
+                  sha: context.sha
+                });
+              } catch (error) {
+                console.log(`Branch ${branchName} already exists.`);
+              }
+
+              // Create issues for the branch
+              for (const issue of branch.issues) {
+                const issueResponse = await github.issues.create({
+                  owner: owner,
+                  repo: repo,
+                  title: issue.issue,
+                  body: `Tasks:\n\n- [ ] ${issue.todos.map(todo => todo.task).join('\n- [ ] ')}`,
+                  labels: [issue.tag],
+                  assignees: [assignee]
+                });
+
+                // Create comments for each todo in the issue
+                for (const todo of issue.todos) {
+                  await github.issues.createComment({
+                    owner: owner,
+                    repo: repo,
+                    issue_number: issueResponse.data.number,
+                    body: `- [ ] ${todo.task} (Tag: ${todo.tag}, Version: ${todo.version}, Milestone: ${todo.milestone})`
+                  });
+                }
+              }
+            }
