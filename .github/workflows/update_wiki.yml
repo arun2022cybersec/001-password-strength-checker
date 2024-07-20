@@ -2,23 +2,23 @@ name: Update Wiki
 
 on:
   push:
-	branches:
-	  - main
+    branches:
+      - main
 
 jobs:
   update-wiki:
-	runs-on: ubuntu-latest
-	steps:
-	  - name: Checkout main repository
-		uses: actions/checkout@v2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v2
 
-	  - name: Checkout Wiki
-		run: |
-		  git clone https://github.com/${{ github.repository }}.wiki.git
-		  cd wiki
-		  # Populate the Wiki with relevant information
-		  echo "## Project Updates" >> Home.md
-		  echo "### New Features" >> Home.md
-		  git add Home.md
-		  git commit -m "Update Wiki with new features and changes"
-		  git push
+      - name: Checkout Wiki
+        run: |
+          git clone https://github.com/${{ github.repository }}.wiki.git
+          cd wiki
+          # Populate the Wiki with relevant information
+          echo "## Project Updates" >> Home.md
+          echo "### New Features" >> Home.md
+          git add Home.md
+          git commit -m "Update Wiki with new features and changes"
+          git push

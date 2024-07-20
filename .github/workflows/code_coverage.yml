@@ -2,26 +2,26 @@ name: Code Coverage
 
 on:
   push:
-	branches:
-	  - main
+    branches:
+      - main
   pull_request:
-	branches:
-	  - main
+    branches:
+      - main
 
 jobs:
   coverage:
-	runs-on: ubuntu-latest
-	steps:
-	  - name: Checkout code
-		uses: actions/checkout@v2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-	  - name: Install dependencies
-		run: npm install
+      - name: Install dependencies
+        run: npm install
 
-	  - name: Run tests with coverage
-		run: npm test -- --coverage
+      - name: Run tests with coverage
+        run: npm test -- --coverage
 
-	  - name: Upload coverage to Codecov
-		uses: codecov/codecov-action@v1
-		with:
-		  file: ./coverage/lcov.info
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage/lcov.info

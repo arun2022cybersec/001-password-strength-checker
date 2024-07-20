@@ -2,16 +2,16 @@ name: Generate Changelog
 
 on:
   release:
-	types: [created]
+    types: [created]
 
 jobs:
   generate-changelog:
-	runs-on: ubuntu-latest
-	steps:
-	  - name: Checkout code
-		uses: actions/checkout@v2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-	  - name: Generate changelog
-		run: |
-		  gem install github_changelog_generator
-		  github_changelog_generator -u ${{ github.repository_owner }} -p ${{ github.event.repository.name }}
+      - name: Generate changelog
+        run: |
+          gem install github_changelog_generator
+          github_changelog_generator -u ${{ github.repository_owner }} -p ${{ github.event.repository.name }}
