@@ -16,3 +16,5 @@ d82a307 chore: Update workflows to use YAML instead of JSON for task loading
 da18d24 chore: Update workflows to use YAML instead of JSON for task loading
 ## Recent Changes
 a572443 chore: Update workflows to use YAML instead of JSON for task loading
+## Recent Changes
+5c55e91 Update Wiki with new features and changes
