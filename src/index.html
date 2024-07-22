@@ -11,20 +11,13 @@
 <body>
     <div class="container">
         <h1>Password Strength Checker</h1>
-        <div class="input-group">
-            <label for="password-input" class="visually-hidden">Enter your password</label>
-            <input type="password" id="password-input" placeholder="Enter your password" required>
-        </div>
-        <div class="password-strength-bar">
-            <div class="bar"></div>
-        </div>
-        <div class="password-strength-text">
-            <span id="strength-text">Password strength: </span>
-            <span id="strength-level">None</span>
+        <input type="password" id="password" placeholder="Enter your password" autocomplete="off">
+        <div id="strength-meter">
+            <progress id="strength-bar" value="0" max="100"></progress>
+            <div id="strength-text"></div>
         </div>
     </div>
-
-    <script src="script.js"></script>
+    <script src="script.js" type="module"></script>
 </body>
 
 </html>
